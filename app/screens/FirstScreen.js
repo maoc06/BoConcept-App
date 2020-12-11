@@ -2,8 +2,9 @@ import React from 'react';
 import {Image, ImageBackground, View, StyleSheet} from 'react-native';
 
 import Button from '../components/Button';
+import routes from '../navigation/routes';
 
-function FirstScreen(props) {
+function FirstScreen({navigation}) {
   return (
     <ImageBackground
       style={styles.background}
@@ -20,8 +21,12 @@ function FirstScreen(props) {
           title="Sign Up with Email"
           backgroundColor="secondary"
           textColor="primary"
+          onPress={() => navigation.navigate(routes.REGISTER)}
         />
-        <Button title="Already have account" />
+        <Button
+          title="Already have account"
+          onPress={() => navigation.navigate(routes.LOGIN)}
+        />
       </View>
     </ImageBackground>
   );
