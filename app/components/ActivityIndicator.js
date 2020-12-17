@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     height: '100%',
     opacity: 0.8,
     width: '100%',
-    zIndex: 1,
+    zIndex: 999,
   },
 });
 

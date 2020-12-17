@@ -1,14 +1,26 @@
 import React from 'react';
-import {View, TextInput, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
+import {TextInput} from 'react-native-paper';
+import colors from '../config/colors';
 
 import defaultStyle from '../config/styles';
 
-function AppTextInput({width = '100%', ...otherProps}) {
+function AppTextInput({width = '100%', error, color, ...otherProps}) {
   return (
     <View style={[styles.container, {width}]}>
       <TextInput
+        mode="flat"
+        underlineColor={defaultStyle.colors[color]}
         placeholderTextColor={defaultStyle.colors.whiteAccent}
-        style={styles.text}
+        theme={{
+          colors: {
+            primary: colors[color],
+            placeholder: colors[color],
+            text: colors[color],
+          },
+        }}
+        error={error}
+        style={[styles.text, {width}]}
         {...otherProps}
       />
     </View>
@@ -18,13 +30,13 @@ function AppTextInput({width = '100%', ...otherProps}) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    marginVertical: 25,
-    borderBottomWidth: 1,
-    borderBottomColor: defaultStyle.colors.whiteAccent,
+    marginVertical: 10,
+    borderWidth: 0,
   },
   text: {
-    color: defaultStyle.colors.whiteAccent,
     fontSize: 16,
+    backgroundColor: 'transparent',
+    // color: defaultStyle.colors.whiteAccent,
   },
 });
 

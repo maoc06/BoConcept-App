@@ -3,10 +3,12 @@ import {NavigationContainer} from '@react-navigation/native';
 import {AppLoading} from 'expo';
 
 import fetchFonts from './app/config/fonts';
-import AuthNavigator from './app/navigation/AuthNavigator';
 import AuthContext from './app/auth/context';
-import HomeScreen from './app/screens/HomeScreen';
+import CartContextProvider from './app/contexts/cartContext';
 import authStorage from './app/auth/storage';
+import AuthNavigator from './app/navigation/AuthNavigator';
+import AppNavigator from './app/navigation/AppNavigator';
+import navigationTheme from './app/navigation/navigationTheme';
 
 export default function App() {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -29,9 +31,11 @@ export default function App() {
   }
   return (
     <AuthContext.Provider value={{user, setUser}}>
-      <NavigationContainer>
-        {user ? <HomeScreen /> : <AuthNavigator />}
-      </NavigationContainer>
+      <CartContextProvider>
+        <NavigationContainer theme={navigationTheme}>
+          {user ? <AppNavigator /> : <AuthNavigator />}
+        </NavigationContainer>
+      </CartContextProvider>
     </AuthContext.Provider>
   );
 }
