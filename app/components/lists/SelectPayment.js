@@ -1,14 +1,17 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
+import {Image} from 'react-native-expo-image-cache';
 
 import {RadioButton} from '../forms';
-import Text from '../Text';
+import Text from '../texts/Text';
 import colors from '../../config/colors';
+import {maskCardNumber} from '../../utility/maskCardNumber';
 
 function SelectPayment({
   cardNumber,
   expiryMonth,
   expiryYear,
+  imageUrl,
   value,
   setValue,
   currValue,
@@ -20,8 +23,10 @@ function SelectPayment({
       </View>
 
       <View style={styles.info}>
-        <Text>Image</Text>
-        <Text style={styles.title}>{cardNumber}</Text>
+        <Image style={styles.tinyPayLogo} uri={imageUrl} />
+
+        <Text style={styles.title}>{maskCardNumber(cardNumber)}</Text>
+
         <Text style={styles.date}>
           {expiryMonth}/{expiryYear}
         </Text>
@@ -42,6 +47,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  tinyPayLogo: {
+    width: 50,
+    height: 35,
   },
   title: {
     fontWeight: 'bold',

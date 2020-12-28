@@ -8,4 +8,6 @@ export default Object.freeze({
   FIND_STORE: 'FindStore',
   CHECKOUT: 'Checkout',
   PRODUCT_DETAIL: 'ProductDetail',
+  ADD_NEW_ADDRESS: 'AddNewAddress',
+  ADD_NEW_PAYMENT: 'AddNewPaymentMethod',
 });

@@ -6,6 +6,8 @@ function cartContextProvider({children}) {
   const [cart, setCart] = useState();
 
   const initialCart = {
+    cartId: 0,
+    items: 0,
     creditCardNumber: null,
     billingAddressId: null,
     shippingMethodId: 1,

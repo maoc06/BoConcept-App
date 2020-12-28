@@ -3,8 +3,8 @@ import {StyleSheet, ImageBackground} from 'react-native';
 import * as Yup from 'yup';
 
 import Screen from '../components/Screen';
-import TitleText from '../components/TitleText';
-import Button from '../components/Button';
+import TextTitle from '../components/texts/TextTitle';
+import Button from '../components/buttons/Button';
 import ActivityIndicator from '../components/ActivityIndicator';
 import {
   ErrorMessage,
@@ -15,7 +15,7 @@ import {
 } from '../components/forms';
 import authApi from '../api/auth';
 import useApi from '../hooks/useApi';
-import useAuth from '../auth/useAuth';
+import useAuth from '../hooks/useAuth';
 import {ScrollView} from 'react-native-gesture-handler';
 
 const validationSchema = Yup.object().shape({
@@ -61,7 +61,7 @@ function RegisterScreen() {
         source={require('../assets/background-first-screen.png')}>
         <Screen style={styles.container}>
           <ScrollView>
-            <TitleText style={styles.title}>Create{'\n'}your account</TitleText>
+            <TextTitle style={styles.title}>Create{'\n'}your account</TextTitle>
 
             <Form
               initialValues={{

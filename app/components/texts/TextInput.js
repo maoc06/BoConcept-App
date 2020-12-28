@@ -1,9 +1,9 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {TextInput} from 'react-native-paper';
-import colors from '../config/colors';
 
-import defaultStyle from '../config/styles';
+import defaultStyle from '../../config/styles';
+import colors from '../../config/colors';
 
 function AppTextInput({width = '100%', error, color, ...otherProps}) {
   return (

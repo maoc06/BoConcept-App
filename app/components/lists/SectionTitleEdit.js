@@ -1,8 +1,8 @@
 import React from 'react';
 import {View, TouchableOpacity, StyleSheet} from 'react-native';
 
-import Text from './Text';
-import colors from '../config/colors';
+import Text from '../texts/Text';
+import colors from '../../config/colors';
 
 function SectionTitleEdit({title, style, onPress}) {
   return (

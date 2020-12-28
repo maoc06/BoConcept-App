@@ -1,7 +1,7 @@
 import React from 'react';
 import {Image, ImageBackground, View, StyleSheet} from 'react-native';
 
-import Button from '../components/Button';
+import Button from '../components/buttons/Button';
 import routes from '../navigation/routes';
 
 function FirstScreen({navigation}) {

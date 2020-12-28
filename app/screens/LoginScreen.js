@@ -3,15 +3,15 @@ import {StyleSheet, ImageBackground} from 'react-native';
 import * as Yup from 'yup';
 
 import Screen from '../components/Screen';
-import TitleText from '../components/TitleText';
-import Button from '../components/Button';
+import TextTitle from '../components/texts/TextTitle';
+import Button from '../components/buttons/Button';
 import {ErrorMessage, Form, FormField, SubmitButton} from '../components/forms';
 import authApi from '../api/auth';
-import useAuth from '../auth/useAuth';
+import useAuth from '../hooks/useAuth';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label('Email'),
-  password: Yup.string().required().min(4).label('Password'),
+  password: Yup.string().required().min(6).label('Password'),
 });
 
 function LoginScreen() {
@@ -31,7 +31,7 @@ function LoginScreen() {
       style={styles.background}
       source={require('../assets/background-first-screen.png')}>
       <Screen style={styles.container}>
-        <TitleText style={styles.title}>Log into{'\n'}your account</TitleText>
+        <TextTitle style={styles.title}>Log into{'\n'}your account</TextTitle>
 
         <Form
           initialValues={{email: '', password: ''}}

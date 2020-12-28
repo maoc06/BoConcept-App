@@ -2,28 +2,29 @@ import React, {useEffect, useState} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
 
 import Screen from '../components/Screen';
-import Text from '../components/Text';
-import Button from '../components/Button';
+import Text from '../components/texts/Text';
+import Button from '../components/buttons/Button';
 import ActivityIndicator from '../components/ActivityIndicator';
-import TextTotalCalc from '../components/TextTotalCalc';
-import SwipeableCard from '../components/SwipeableCard';
+import TextTotalCalc from '../components/texts/TextTotalCalc';
+import CardSwipeable from '../components/cards/CardSwipeable';
 import routes from '../navigation/routes';
 import useApi from '../hooks/useApi';
-import useAuth from '../auth/useAuth';
-import shoppingProductApi from '../api/shoppingProduct';
+import useAuth from '../hooks/useAuth';
+import useCart from '../hooks/useCart';
+import shprApi from '../api/shoppingProduct';
 import colors from '../config/colors';
 import calcTotal from '../utility/calcTotal';
 import {currencyFormat} from '../utility/currency';
 
 function CartScreen({navigation}) {
-  const [shoppingProducts, setShoppingProducts] = useState([]);
+  const {cart, addCartItem, removeCartItem} = useCart();
   const {user} = useAuth();
-  const getShoppingProductApi = useApi(
-    shoppingProductApi.getShoppingProductsByEnableCart
-  );
-  const deleteShoppingProductApi = useApi(
-    shoppingProductApi.deleteShoppingProduct
-  );
+
+  const getShoppingProductApi = useApi(shprApi.getShoppingProductsByEnableCart);
+  const updateShoppingProductApi = useApi(shprApi.updateShoppingProduct);
+  const deleteShoppingProductApi = useApi(shprApi.deleteShoppingProduct);
+
+  const [shoppingProducts, setShoppingProducts] = useState([]);
 
   useEffect(() => {
     getShoppingProductApi.request({email: user.info.email});
@@ -35,8 +36,28 @@ function CartScreen({navigation}) {
     }
   });
 
-  const handleRemoveProduct = async (shprId) => {
-    await deleteShoppingProductApi.request({shprId});
+  const handleShprAdd = (shpr) => {
+    shpr.quantity += 1;
+    shpr.car_id = cart.cartId;
+    updateShoppingProductApi.request(shpr);
+    addCartItem();
+  };
+
+  const handleShprRemove = (shpr) => {
+    if (shpr.quantity === 1) {
+      handleRemoveProduct(shpr);
+      return;
+    }
+    shpr.quantity -= 1;
+    shpr.car_id = cart.cartId;
+    updateShoppingProductApi.request(shpr);
+    removeCartItem();
+  };
+
+  const handleRemoveProduct = async (shpr) => {
+    const {shpr_id, quantity} = shpr;
+    removeCartItem(quantity);
+    await deleteShoppingProductApi.request({shprId: shpr_id});
     getShoppingProductApi.request({email: user.info.email});
   };
 
@@ -60,10 +81,12 @@ function CartScreen({navigation}) {
         data={shoppingProducts}
         keyExtractor={(product) => product.pro_id.toString()}
         renderItem={({item}) => (
-          <SwipeableCard
+          <CardSwipeable
             product={item}
             onPressLeft={() => alert(`Go to edit ${item.name}`)}
-            onPressRight={() => handleRemoveProduct(item.shpr_id)}
+            onPressRight={() => handleRemoveProduct(item)}
+            handleAdd={() => handleShprAdd(item)}
+            handleRemove={() => handleShprRemove(item)}
           />
         )}
         ListFooterComponent={
@@ -91,7 +114,9 @@ function CartScreen({navigation}) {
     <>
       <ActivityIndicator
         visible={
-          getShoppingProductApi.loading || deleteShoppingProductApi.loading
+          getShoppingProductApi.loading ||
+          deleteShoppingProductApi.loading ||
+          updateShoppingProductApi.loading
         }
       />
 
@@ -109,11 +134,13 @@ function CartScreen({navigation}) {
         {shoppingProducts && (
           <>
             <Text style={styles.title}>Shopping Cart</Text>
+
             <Text style={styles.quantity}>
               {shoppingProducts.length === 0
                 ? '0 item(s)'
                 : `${calcTotal.quantity(shoppingProducts)} item(s)`}
             </Text>
+
             {renderCart()}
           </>
         )}

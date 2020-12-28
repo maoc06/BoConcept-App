@@ -2,9 +2,12 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import LogoTitleHeader from '../components/LogoTitleHeader';
-import ButtonIcon from '../components/ButtonIcon';
+import ButtonIcon from '../components/buttons/ButtonIcon';
 import CartScreen from '../screens/CartScreen';
-import ChechkoutScreen from '../screens/CheckoutScreen';
+import CheckoutNavigator from './CheckoutNavigator';
+import CartBadge from '../components/CartBadge';
+import routes from './routes';
+import defaultStyles from '../config/styles';
 
 const Stack = createStackNavigator();
 
@@ -14,6 +17,7 @@ const CartNavigator = ({navigation}) => (
       name="Cart"
       component={CartScreen}
       options={{
+        headerStyle: defaultStyles.header,
         headerTitle: (props) => <LogoTitleHeader {...props} />,
         headerLeft: () => (
           <ButtonIcon
@@ -23,18 +27,15 @@ const CartNavigator = ({navigation}) => (
           />
         ),
         headerRight: () => (
-          <ButtonIcon
-            icon={require('../assets/cart-icon.png')}
-            style={{marginRight: 16}}
-            onPress={() => {}}
-          />
+          <CartBadge onPress={() => navigation.navigate(routes.CART)} />
         ),
       }}
     />
+
     <Stack.Screen
       name="Checkout"
-      component={ChechkoutScreen}
-      options={{headerTitleAlign: 'center'}}
+      component={CheckoutNavigator}
+      options={{headerShown: false}}
     />
   </Stack.Navigator>
 );

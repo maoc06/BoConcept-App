@@ -3,9 +3,9 @@ import {View, StyleSheet} from 'react-native';
 import {Drawer, Avatar} from 'react-native-paper';
 import {DrawerItem, DrawerContentScrollView} from '@react-navigation/drawer';
 
-import Text from '../components/Text';
+import Text from '../components/texts/Text';
 import colors from '../config/colors';
-import useAuth from '../auth/useAuth';
+import useAuth from '../hooks/useAuth';
 import routes from './routes';
 
 function DrawerContent(props) {

@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 
 import Text from './Text';
-import colors from '../config/colors';
+import colors from '../../config/colors';
 
 function TextTotalCalc({
   title,

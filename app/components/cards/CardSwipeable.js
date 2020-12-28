@@ -3,17 +3,26 @@ import {View, StyleSheet} from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import Card from './Card';
-import Text from '../components/Text';
-import ButtonQuantity from './ButtonQuantity';
-import colors from '../config/colors';
-import {currencyFormat} from '../utility/currency';
-import ButtonSwip from './ButtonSwip';
+import Text from '../texts/Text';
+import Button from '../buttons/Button';
+import ButtonSwip from '../buttons/ButtonSwip';
+import ButtonQuantity from '../buttons/ButtonQuantity';
+import {currencyFormat} from '../../utility/currency';
+import colors from '../../config/colors';
 
 function SwipeableCard({
   product,
   onPressRight,
   onPressLeft,
   swipeableActive = true,
+  swipeableLeft = true,
+  swipeableRight = true,
+  showDescription = true,
+  showQuantity = true,
+  showAuxButton = false,
+  handleAuxButton,
+  handleAdd,
+  handleRemove,
 }) {
   const LeftActions = () => {
     return <ButtonSwip title={'Edit'} onPress={onPressLeft} />;
@@ -29,34 +38,52 @@ function SwipeableCard({
     if (!swipeableActive) {
       return <Text>Qty: {product.quantity}</Text>;
     }
-    return <ButtonQuantity quantity={product.quantity} />;
+    return (
+      <ButtonQuantity
+        quantity={product.quantity}
+        handleAdd={handleAdd}
+        handleRemove={handleRemove}
+      />
+    );
   };
 
   const ItemCard = () => {
     return (
       <View style={styles.container}>
         <View style={styles.productImage}>
-          <Card showDetails={false} />
+          <Card imageUrl={product.image} showDetails={false} />
         </View>
 
         <View style={styles.productInfo}>
           <Text style={styles.title}>{product.name}</Text>
 
-          <View style={styles.detailsContainer}>
-            <Text style={styles.subtitle}>
-              Upholstery: dusty red Cotton Velvet fabric 6118
-            </Text>
+          {showDescription && (
+            <View style={styles.detailsContainer}>
+              <Text style={styles.subtitle}>
+                Upholstery: dusty red Cotton Velvet fabric 6118
+              </Text>
 
-            <Text style={styles.subtitle}>
-              Leg style: aluminium-coloured, 15cm, 4290
-            </Text>
-          </View>
+              <Text style={styles.subtitle}>
+                Leg style: aluminium-coloured, 15cm, 4290
+              </Text>
+            </View>
+          )}
 
-          <View style={styles.quantityContainer}>
-            <Text>{currencyFormat(product.price)}</Text>
+          <Text>{currencyFormat(product.price)}</Text>
 
-            {QuantityComponent()}
-          </View>
+          {!showDescription && (
+            <Text style={styles.auxDescription}>View full details</Text>
+          )}
+
+          {showAuxButton && (
+            <Button
+              marginVertical={'30%'}
+              title="Add to cart"
+              onPress={handleAuxButton}
+            />
+          )}
+
+          {showQuantity && QuantityComponent()}
         </View>
       </View>
     );
@@ -65,6 +92,13 @@ function SwipeableCard({
   if (!swipeableActive) {
     return ItemCard();
   }
+
+  if (swipeableRight && !swipeableLeft) {
+    return (
+      <Swipeable renderRightActions={RightActions}>{ItemCard()}</Swipeable>
+    );
+  }
+
   return (
     <Swipeable
       renderLeftActions={LeftActions}
@@ -101,10 +135,8 @@ const styles = StyleSheet.create({
   detailsContainer: {
     marginBottom: 10,
   },
-  quantityContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  auxDescription: {
+    color: colors.medium,
   },
 });
 

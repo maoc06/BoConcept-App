@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, Animated, StyleSheet, TouchableHighlight} from 'react-native';
-import colors from '../config/colors';
+
+import colors from '../../config/colors';
 
 function ButtonSwip({title, color = 'primary', onPress}) {
   return (

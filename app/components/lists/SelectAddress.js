@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 
 import {RadioButton} from '../forms';
-import Text from '../Text';
+import Text from '../texts/Text';
 import colors from '../../config/colors';
 
 function SelectAddress({name, address, zipCode, value, setValue, currValue}) {

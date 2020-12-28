@@ -3,7 +3,7 @@ import {useFormikContext} from 'formik';
 import {View, StyleSheet} from 'react-native';
 import {Checkbox} from 'react-native-paper';
 
-import Text from '../Text';
+import Text from '../texts/Text';
 import ErrorMessage from './ErrorMessage';
 import colors from '../../config/colors';
 

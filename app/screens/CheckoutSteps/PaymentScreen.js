@@ -1,25 +1,32 @@
 import React, {useState, useEffect} from 'react';
-import {View, FlatList, StyleSheet} from 'react-native';
+import {FlatList, StyleSheet} from 'react-native';
 
-import Text from '../../components/Text';
-import Button from '../../components/Button';
+import Text from '../../components/texts/Text';
+import Button from '../../components/buttons/Button';
 import ActivityIndicator from '../../components/ActivityIndicator';
 import {SelectPayment, AddNewContainer} from '../../components/lists';
 import {ErrorMessage} from '../../components/forms';
 import useApi from '../../hooks/useApi';
-import useAuth from '../../auth/useAuth';
+import useAuth from '../../hooks/useAuth';
 import useCart from '../../hooks/useCart';
 import creditCardApi from '../../api/creditCard';
+import colors from '../../config/colors';
+import routes from '../../navigation/routes';
 
-function PaymentScreen({setStep}) {
+function PaymentScreen({setStep, navigation}) {
   const {user} = useAuth();
   const {cart, setCartCreditCard} = useCart();
   const getCreditCards = useApi(creditCardApi.getCreditCardsByCustomer);
+  const [creditCards, setCreditCards] = useState();
   const [error, setError] = useState(false);
 
   useEffect(() => {
     getCreditCards.request({email: user.info.email});
   }, []);
+
+  useEffect(() => {
+    setCreditCards(getCreditCards.data.data);
+  });
 
   const handlePaymentMethod = (value) => {
     setError(false);
@@ -34,6 +41,19 @@ function PaymentScreen({setStep}) {
     setStep(3);
   };
 
+  const renderEmptyMessage = () => {
+    if (creditCards !== undefined) {
+      if (creditCards.length === 0) {
+        return (
+          <Text style={styles.empty}>
+            You don't have payment methods yet. Add a new one.
+          </Text>
+        );
+      }
+    }
+    return null;
+  };
+
   return (
     <>
       <ActivityIndicator visible={getCreditCards.loading} />
@@ -44,6 +64,7 @@ function PaymentScreen({setStep}) {
             <ErrorMessage error="Select a payment method" visible={error} />
 
             <Text style={styles.title}>Select your payment method</Text>
+            {renderEmptyMessage()}
           </>
         }
         data={getCreditCards.data.data}
@@ -53,6 +74,7 @@ function PaymentScreen({setStep}) {
             cardNumber={item.card_number}
             expiryMonth={item.expiry_month}
             expiryYear={item.expiry_year}
+            imageUrl={item.image_url}
             value={item.card_number}
             currValue={cart.creditCardNumber}
             setValue={() => handlePaymentMethod(item.card_number)}
@@ -62,7 +84,7 @@ function PaymentScreen({setStep}) {
           <>
             <AddNewContainer
               title="+ Add new payment method"
-              onPress={() => alert('Go to add new payment method')}
+              onPress={() => navigation.navigate(routes.ADD_NEW_PAYMENT)}
             />
 
             <Button
@@ -83,6 +105,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: 'bold',
+  },
+  empty: {
+    paddingVertical: 15,
+    paddingLeft: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.whiteAccent,
   },
 });
 

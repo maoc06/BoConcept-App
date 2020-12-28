@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, StyleSheet} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
-import defaultStyle from '../config/styles';
+import defaultStyle from '../../config/styles';
 
 function TextCategory({children, active, onPress, ...otherProps}) {
   return (

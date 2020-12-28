@@ -2,7 +2,7 @@ import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {RadioButton} from 'react-native-paper';
 
-import Text from '../Text';
+import Text from '../texts/Text';
 import colors from '../../config/colors';
 
 function AppRadioButton({children, value, currValue, setValue}) {

@@ -8,4 +8,6 @@ const getCreditCardsByCustomer = ({email}) =>
 const getCreditCardById = ({cardNumber}) =>
   client.get(`${endpoint}/${cardNumber}`);
 
-export default {getCreditCardsByCustomer, getCreditCardById};
+const saveCreditCrad = (cardInfo) => client.post(endpoint, cardInfo);
+
+export default {getCreditCardsByCustomer, getCreditCardById, saveCreditCrad};

@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 
 import Screen from '../components/Screen';
-import Text from '../components/Text';
+import Text from '../components/texts/Text';
 
 function FindStoreScreen() {
   return (

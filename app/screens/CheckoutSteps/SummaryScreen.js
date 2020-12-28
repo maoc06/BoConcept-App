@@ -2,15 +2,17 @@ import React, {useEffect, useState} from 'react';
 import {View, FlatList, StyleSheet} from 'react-native';
 import * as Yup from 'yup';
 
-import Text from '../../components/Text';
+import Text from '../../components/texts/Text';
 import {Form, CheckBox, SubmitButton} from '../../components/forms';
-import TextTotalCalc from '../../components/TextTotalCalc';
+import TextTotalCalc from '../../components/texts/TextTotalCalc';
 import ActivityIndicator from '../../components/ActivityIndicator';
-import SwipeableCard from '../../components/SwipeableCard';
-import SectionTitleEdit from '../../components/SectionTitleEdit';
+import CardSwipeable from '../../components/cards/CardSwipeable';
+import SectionTitleEdit from '../../components/lists/SectionTitleEdit';
+import SuccessPaymentScreen from '../SuccessPaymentScreen';
 import useApi from '../../hooks/useApi';
-import useAuth from '../../auth/useAuth';
+import useAuth from '../../hooks/useAuth';
 import useCart from '../../hooks/useCart';
+import orderApi from '../../api/order';
 import addressApi from '../../api/address';
 import shippingMethodApi from '../../api/shippingMethods';
 import creditCardApi from '../../api/creditCard';
@@ -18,20 +20,27 @@ import shoppingProductApi from '../../api/shoppingProduct';
 import colors from '../../config/colors';
 import calcTotal from '../../utility/calcTotal';
 import {currencyFormat} from '../../utility/currency';
+import {getRandomInt} from '../../utility/getRandomInt';
+import {dateFormat} from '../../utility/dateFormat';
+import {maskCardNumber} from '../../utility/maskCardNumber';
 
 const validationSchema = Yup.object().shape({
   terms: Yup.bool().oneOf([true], 'Must accept Terms of the shop'),
 });
 
-function SummaryScreen() {
+function SummaryScreen({setStep, navigation}) {
   const {user} = useAuth();
-  const {cart} = useCart();
+  const {cart, clearCart} = useCart();
+
   const getAddressApi = useApi(addressApi.getAddressById);
   const getShippingMethodApi = useApi(shippingMethodApi.getShippingMethod);
   const getCreditCardApi = useApi(creditCardApi.getCreditCardById);
-  const getShoppingProductApi = useApi(
-    shoppingProductApi.getShoppingProductsByEnableCart
-  );
+  const getShprApi = useApi(shoppingProductApi.getShoppingProductsByEnableCart);
+  const generateOrderApi = useApi(orderApi.generateOrder);
+
+  const [orderNumber, setOrderNumber] = useState();
+  const [successVisible, setSuccessVisible] = useState(false);
+
   let shippingCost = 0;
   let subTotal = 0;
 
@@ -39,11 +48,29 @@ function SummaryScreen() {
     getAddressApi.request({addressId: cart.billingAddressId});
     getShippingMethodApi.request({id: cart.shippingMethodId});
     getCreditCardApi.request({cardNumber: cart.creditCardNumber});
-    getShoppingProductApi.request({email: user.info.email});
+    getShprApi.request({email: user.info.email});
   }, []);
 
   const handleSubmit = () => {
-    alert('Make Shopping');
+    const randomOrderNumber = getRandomInt(10000, 100000);
+    setOrderNumber(randomOrderNumber);
+
+    const orderInfo = {
+      order_number: randomOrderNumber,
+      car_id: cart.cartId,
+      email: user.info.email,
+      card_number: cart.creditCardNumber,
+      billing_addres_id: cart.billingAddressId,
+      shipping_method_id: cart.shippingMethodId,
+      subtotal: subTotal,
+      shipping_cost: shippingCost,
+      payment_date: dateFormat(),
+    };
+    generateOrderApi.request(orderInfo);
+
+    clearCart();
+
+    setSuccessVisible(true);
   };
 
   const renderBillingInfo = () => {
@@ -93,8 +120,10 @@ function SummaryScreen() {
   const renderPaymentInfo = () => {
     return (
       <>
-        <Text style={styles.text}>Master Card</Text>
-        <Text>{getCreditCardApi.data.data.card_number}</Text>
+        <Text style={[styles.text, {textTransform: 'capitalize'}]}>
+          {getCreditCardApi.data.data.name}
+        </Text>
+        <Text>{maskCardNumber(getCreditCardApi.data.data.card_number)}</Text>
       </>
     );
   };
@@ -108,7 +137,7 @@ function SummaryScreen() {
           <SectionTitleEdit
             title="Billing"
             style={{marginBottom: 15}}
-            onPress={() => alert('Edit Billing')}
+            onPress={() => setStep(1)}
           />
           {renderBillingInfo()}
         </View>
@@ -117,7 +146,7 @@ function SummaryScreen() {
           <SectionTitleEdit
             title="Shipping"
             style={{marginBottom: 15}}
-            onPress={() => alert('Edit Shipping')}
+            onPress={() => setStep(1)}
           />
           {renderShippingInfo()}
         </View>
@@ -126,7 +155,7 @@ function SummaryScreen() {
           <SectionTitleEdit
             title="Payment"
             style={{marginBottom: 15}}
-            onPress={() => alert('Edit Payment')}
+            onPress={() => setStep(2)}
           />
           {renderPaymentInfo()}
         </View>
@@ -142,7 +171,7 @@ function SummaryScreen() {
   };
 
   const renderFooterList = () => {
-    subTotal = calcTotal.price(getShoppingProductApi.data.data);
+    subTotal = calcTotal.price(getShprApi.data.data);
 
     return (
       <>
@@ -184,7 +213,7 @@ function SummaryScreen() {
       getAddressApi.data.data === undefined ||
       getShippingMethodApi.data.data === undefined ||
       getCreditCardApi.data.data === undefined ||
-      getShoppingProductApi.data.data === undefined
+      getShprApi.data.data === undefined
     ) {
       return null;
     }
@@ -193,10 +222,10 @@ function SummaryScreen() {
       <FlatList
         fadingEdgeLength={50}
         ListHeaderComponent={renderHeaderList()}
-        data={getShoppingProductApi.data.data}
+        data={getShprApi.data.data}
         keyExtractor={(product) => product.pro_id.toString()}
         renderItem={({item}) => (
-          <SwipeableCard product={item} swipeableActive={false} />
+          <CardSwipeable product={item} swipeableActive={false} />
         )}
         ListFooterComponent={renderFooterList()}
       />
@@ -205,12 +234,18 @@ function SummaryScreen() {
 
   return (
     <>
+      <SuccessPaymentScreen
+        visible={successVisible}
+        navigation={navigation}
+        number={orderNumber}
+      />
+
       <ActivityIndicator
         visible={
           getAddressApi.loading ||
           getShippingMethodApi.loading ||
           getCreditCardApi.loading ||
-          getShoppingProductApi.loading
+          getShprApi.loading
         }
       />
 

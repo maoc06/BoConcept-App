@@ -11,4 +11,8 @@ export default {
     fontSize: 36,
     fontWeight: 'bold',
   },
+  header: {
+    shadowColor: 'transparent',
+    elevation: 0,
+  },
 };

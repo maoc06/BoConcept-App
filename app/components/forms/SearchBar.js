@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {Searchbar} from 'react-native-paper';
+
 import colors from '../../config/colors';
 
 function SearchBar({width, onChangeText, value, ...otherProps}) {

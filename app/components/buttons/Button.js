@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text, TouchableOpacity, StyleSheet} from 'react-native';
 
-import defaultStyle from '../config/styles';
+import defaultStyle from '../../config/styles';
 
 function Button({
   title,

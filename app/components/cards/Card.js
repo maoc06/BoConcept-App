@@ -1,15 +1,18 @@
 import React from 'react';
-import {View, Image, StyleSheet, TouchableWithoutFeedback} from 'react-native';
+import {View, StyleSheet, TouchableWithoutFeedback} from 'react-native';
+import {Image} from 'react-native-expo-image-cache';
 
-import Text from './Text';
-import colors from '../config/colors';
-import {currencyFormat} from '../utility/currency';
+import Text from '../texts/Text';
+import colors from '../../config/colors';
+import {currencyFormat} from '../../utility/currency';
 
-function Card({title, subtitle, showDetails = true, onPress}) {
+function Card({title, subtitle, imageUrl, showDetails = true, onPress}) {
   return (
     <TouchableWithoutFeedback onPress={onPress}>
       <View style={styles.card}>
-        <Image style={styles.image} />
+        <View style={styles.imageContainer}>
+          <Image style={styles.image} uri={imageUrl} />
+        </View>
 
         {showDetails && (
           <View style={styles.detailsContainer}>
@@ -28,6 +31,8 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     flex: 1,
     overflow: 'hidden',
+    // borderWidth: 1,
+    // borderColor: colors.redAccent,
   },
   detailsContainer: {
     display: 'flex',
@@ -36,9 +41,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingLeft: 10,
   },
-  image: {
+  imageContainer: {
     width: '100%',
     height: 200,
+    padding: 5,
     backgroundColor: colors.whiteAccent,
   },
   title: {
@@ -47,6 +53,9 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: colors.medium,
+  },
+  image: {
+    aspectRatio: 1.7,
   },
 });
 

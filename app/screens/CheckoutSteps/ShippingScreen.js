@@ -1,32 +1,37 @@
 import React, {useState, useEffect} from 'react';
 import {View, FlatList, StyleSheet} from 'react-native';
 
-import Text from '../../components/Text';
-import Button from '../../components/Button';
+import Text from '../../components/texts/Text';
+import Button from '../../components/buttons/Button';
 import ActivityIndicator from '../../components/ActivityIndicator';
 import {RadioButton, ErrorMessage} from '../../components/forms';
 import {SelectAddress, AddNewContainer} from '../../components/lists';
 import useApi from '../../hooks/useApi';
-import useAuth from '../../auth/useAuth';
+import useAuth from '../../hooks/useAuth';
 import useCart from '../../hooks/useCart';
 import addressApi from '../../api/address';
 import shippingMethodsApi from '../../api/shippingMethods';
+import colors from '../../config/colors';
+import routes from '../../navigation/routes';
 
-function ShippingScreen({setStep}) {
+function ShippingScreen({setStep, navigation}) {
   const {user} = useAuth();
   const {cart, setCartBillingAddress, setCartShippingMethod} = useCart();
   const getCustomerAddressApi = useApi(addressApi.getAddressCustomer);
   const getShippingMethodsApi = useApi(shippingMethodsApi.getShippingMethods);
+  const [customerAddress, setCustomerAddress] = useState();
   const [errorBillingAddress, setErrorBillingAddress] = useState(false);
-  const [errorShippingMethod, setErrorShippingMethod] = useState(false);
 
   useEffect(() => {
     getCustomerAddressApi.request({email: user.info.email});
     getShippingMethodsApi.request();
   }, []);
 
+  useEffect(() => {
+    setCustomerAddress(getCustomerAddressApi.data.data);
+  });
+
   const handleSelectShippigMethod = (value) => {
-    setErrorShippingMethod(false);
     setCartShippingMethod(value);
   };
 
@@ -38,9 +43,6 @@ function ShippingScreen({setStep}) {
   const handleSubmit = () => {
     if (cart.billingAddressId === null) {
       setErrorBillingAddress(true);
-    }
-    if (cart.shippingMethodId === null) {
-      setErrorShippingMethod(true);
       return;
     }
     setStep(2);
@@ -52,12 +54,6 @@ function ShippingScreen({setStep}) {
         <Text style={styles.text}>Shipping method</Text>
 
         <FlatList
-          ListHeaderComponent={
-            <ErrorMessage
-              error="Select a shipping method"
-              visible={errorShippingMethod}
-            />
-          }
           data={getShippingMethodsApi.data.data}
           keyExtractor={(shippingMethod) =>
             shippingMethod.shipping_method_id.toString()
@@ -84,6 +80,44 @@ function ShippingScreen({setStep}) {
     );
   };
 
+  const renderHeaderList = () => {
+    return (
+      <>
+        <ErrorMessage
+          error="Select a shipping address"
+          visible={errorBillingAddress}
+        />
+        <Text style={styles.text}>Select your address</Text>
+        {renderEmptyMessage()}
+      </>
+    );
+  };
+
+  const renderFooterList = () => {
+    return (
+      <>
+        <AddNewContainer
+          title="+ Add new address"
+          onPress={() => navigation.navigate(routes.ADD_NEW_ADDRESS)}
+        />
+        {renderShippingMethodsList()}
+      </>
+    );
+  };
+
+  const renderEmptyMessage = () => {
+    if (customerAddress !== undefined) {
+      if (customerAddress.length === 0) {
+        return (
+          <Text style={styles.empty}>
+            You don't have address yet. Add a new one.
+          </Text>
+        );
+      }
+    }
+    return null;
+  };
+
   return (
     <>
       <ActivityIndicator
@@ -92,15 +126,7 @@ function ShippingScreen({setStep}) {
 
       <FlatList
         fadingEdgeLength={50}
-        ListHeaderComponent={
-          <>
-            <ErrorMessage
-              error="Select a shipping address"
-              visible={errorBillingAddress}
-            />
-            <Text style={styles.text}>Select your address</Text>
-          </>
-        }
+        ListHeaderComponent={renderHeaderList()}
         data={getCustomerAddressApi.data.data}
         keyExtractor={(address) => address.address_id.toString()}
         renderItem={({item}) => (
@@ -113,15 +139,7 @@ function ShippingScreen({setStep}) {
             setValue={() => handleSelectAddress(item.address_id)}
           />
         )}
-        ListFooterComponent={
-          <>
-            <AddNewContainer
-              title="+ Add new address"
-              onPress={() => alert('Go to add new address')}
-            />
-            {renderShippingMethodsList()}
-          </>
-        }
+        ListFooterComponent={renderFooterList()}
       />
     </>
   );
@@ -137,6 +155,12 @@ const styles = StyleSheet.create({
   },
   text: {
     fontWeight: 'bold',
+  },
+  empty: {
+    paddingVertical: 15,
+    paddingLeft: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.whiteAccent,
   },
 });
 

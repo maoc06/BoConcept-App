@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity} from 'react-native';
 
-import Text from '../Text';
+import Text from '../texts/Text';
 import colors from '../../config/colors';
 
 function AddNewContainer({title, onPress}) {
