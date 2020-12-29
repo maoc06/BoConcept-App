@@ -38,6 +38,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     // color: defaultStyle.colors.whiteAccent,
   },
+  affix: {
+    borderWidth: 1,
+    borderColor: colors.redAccent,
+  },
 });
 
 export default AppTextInput;

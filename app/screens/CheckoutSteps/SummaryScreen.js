@@ -12,17 +12,20 @@ import SuccessPaymentScreen from '../SuccessPaymentScreen';
 import useApi from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import useCart from '../../hooks/useCart';
+import useLocation from '../../hooks/useLocation';
 import orderApi from '../../api/order';
 import addressApi from '../../api/address';
 import shippingMethodApi from '../../api/shippingMethods';
 import creditCardApi from '../../api/creditCard';
 import shoppingProductApi from '../../api/shoppingProduct';
+import storesApi from '../../api/store';
 import colors from '../../config/colors';
 import calcTotal from '../../utility/calcTotal';
 import {currencyFormat} from '../../utility/currency';
 import {getRandomInt} from '../../utility/getRandomInt';
 import {dateFormat} from '../../utility/dateFormat';
 import {maskCardNumber} from '../../utility/maskCardNumber';
+import {getNearbyStore} from '../../utility/getNearbyStore';
 
 const validationSchema = Yup.object().shape({
   terms: Yup.bool().oneOf([true], 'Must accept Terms of the shop'),
@@ -31,15 +34,18 @@ const validationSchema = Yup.object().shape({
 function SummaryScreen({setStep, navigation}) {
   const {user} = useAuth();
   const {cart, clearCart} = useCart();
+  const location = useLocation();
 
   const getAddressApi = useApi(addressApi.getAddressById);
   const getShippingMethodApi = useApi(shippingMethodApi.getShippingMethod);
   const getCreditCardApi = useApi(creditCardApi.getCreditCardById);
   const getShprApi = useApi(shoppingProductApi.getShoppingProductsByEnableCart);
   const generateOrderApi = useApi(orderApi.generateOrder);
+  const getStoresApi = useApi(storesApi.getStores);
 
   const [orderNumber, setOrderNumber] = useState();
   const [successVisible, setSuccessVisible] = useState(false);
+  const [nearbyStore, setNearbyStore] = useState();
 
   let shippingCost = 0;
   let subTotal = 0;
@@ -49,7 +55,20 @@ function SummaryScreen({setStep, navigation}) {
     getShippingMethodApi.request({id: cart.shippingMethodId});
     getCreditCardApi.request({cardNumber: cart.creditCardNumber});
     getShprApi.request({email: user.info.email});
+    getStoresApi.request();
   }, []);
+
+  useEffect(() => {
+    if (getStoresApi.data.data !== undefined && location !== undefined) {
+      setNearbyStore(
+        getNearbyStore(
+          location.latitude,
+          location.longitude,
+          getStoresApi.data.data
+        )
+      );
+    }
+  }, [getStoresApi.data.data, location]);
 
   const handleSubmit = () => {
     const randomOrderNumber = getRandomInt(10000, 100000);
@@ -62,6 +81,7 @@ function SummaryScreen({setStep, navigation}) {
       card_number: cart.creditCardNumber,
       billing_addres_id: cart.billingAddressId,
       shipping_method_id: cart.shippingMethodId,
+      store_id: nearbyStore.store_id,
       subtotal: subTotal,
       shipping_cost: shippingCost,
       payment_date: dateFormat(),
@@ -84,10 +104,10 @@ function SummaryScreen({setStep, navigation}) {
           {getAddressApi.data.data.zip_code}
         </Text>
         <Text>
-          {getAddressApi.data.data.city}
+          {getAddressApi.data.data.country}, {getAddressApi.data.data.city}
           {'\n'}
         </Text>
-        <Text>66542336</Text>
+        <Text>{getAddressApi.data.data.phone}</Text>
         <Text>{user.info.email}</Text>
       </View>
     );
@@ -97,16 +117,22 @@ function SummaryScreen({setStep, navigation}) {
     shippingCost =
       getShippingMethodApi.data.data.shipping_method_id === 1 ? 0 : 575;
 
+    if (nearbyStore === undefined) {
+      return null;
+    }
+
     return (
       <>
         <Text style={styles.text}>
           Point of service:{' '}
           <Text style={{fontWeight: 'normal'}}>
-            BoConcept Tottenham Court Road 158 Tottenham Court Road
+            {nearbyStore.title}, {nearbyStore.description}.
           </Text>
         </Text>
-        <Text>London, W1T 7NH</Text>
-        <Text>United Kingdom{'\n'}</Text>
+        <Text>
+          {nearbyStore.city}, {nearbyStore.country}
+          {'\n'}
+        </Text>
         <Text style={styles.text}>
           Shipping method:{' '}
           <Text style={{fontWeight: 'normal'}}>
