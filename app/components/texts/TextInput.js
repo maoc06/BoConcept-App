@@ -17,6 +17,7 @@ function AppTextInput({width = '100%', error, color, ...otherProps}) {
             primary: colors[color],
             placeholder: colors[color],
             text: colors[color],
+            error: colors.primary,
           },
         }}
         error={error}
@@ -36,11 +37,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     backgroundColor: 'transparent',
-    // color: defaultStyle.colors.whiteAccent,
-  },
-  affix: {
-    borderWidth: 1,
-    borderColor: colors.redAccent,
   },
 });
 

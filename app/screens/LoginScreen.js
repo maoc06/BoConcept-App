@@ -5,23 +5,31 @@ import * as Yup from 'yup';
 import Screen from '../components/Screen';
 import TextTitle from '../components/texts/TextTitle';
 import Button from '../components/buttons/Button';
+import ActivityIndicator from '../components/ActivityIndicator';
 import {ErrorMessage, Form, FormField, SubmitButton} from '../components/forms';
 import authApi from '../api/auth';
 import useAuth from '../hooks/useAuth';
+import routes from '../navigation/routes';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label('Email'),
   password: Yup.string().required().min(6).label('Password'),
 });
 
-function LoginScreen() {
+function LoginScreen({navigation}) {
   const auth = useAuth();
   const [loginFailed, setLoginFailed] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async ({email, password}) => {
+    setLoading(true);
     const result = await authApi.signIn(email, password);
-    if (!result.ok) return setLoginFailed(true);
+    if (!result.ok) {
+      setLoading(false);
+      return setLoginFailed(true);
+    }
     setLoginFailed(false);
+    setLoading(false);
     auth.logIn(result.data.token);
   };
 
@@ -30,6 +38,8 @@ function LoginScreen() {
       blurRadius={3}
       style={styles.background}
       source={require('../assets/background-first-screen.png')}>
+      <ActivityIndicator visible={loading} />
+
       <Screen style={styles.container}>
         <TextTitle style={styles.title}>Log into{'\n'}your account</TextTitle>
 
@@ -75,6 +85,7 @@ function LoginScreen() {
             backgroundColor="transparent"
             alignText="flex-start"
             marginVertical={20}
+            onPress={() => navigation.navigate(routes.REGISTER)}
           />
         </Form>
       </Screen>

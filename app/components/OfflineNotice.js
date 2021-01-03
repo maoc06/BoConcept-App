@@ -22,12 +22,11 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     backgroundColor: colors.redAccent,
-    height: 50,
+    height: 30,
     justifyContent: 'center',
-    position: 'absolute',
-    top: Constants.statusBarHeight,
+    marginTop: Constants.statusBarHeight,
     width: '100%',
-    zIndex: 1,
+    zIndex: 999,
   },
   text: {
     color: colors.secondary,

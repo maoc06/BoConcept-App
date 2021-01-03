@@ -24,7 +24,6 @@ function AppFormField({
 
   const handleChangeCard = (value) => {
     setFieldValue(name, value);
-    console.log('type', identifyPayment(value));
     setPaymentId(identifyPayment(value));
   };
 

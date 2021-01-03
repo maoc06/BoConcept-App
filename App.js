@@ -5,6 +5,8 @@ import {AppLoading} from 'expo';
 import fetchFonts from './app/config/fonts';
 import AuthContext from './app/contexts/authContext';
 import CartContextProvider from './app/contexts/cartContext';
+import AddressContextProvider from './app/contexts/addressContext';
+import PaymentContextProvider from './app/contexts/paymentContext';
 import authStorage from './app/auth/storage';
 import AuthNavigator from './app/navigation/AuthNavigator';
 import AppNavigator from './app/navigation/AppNavigator';
@@ -32,11 +34,15 @@ export default function App() {
   }
   return (
     <AuthContext.Provider value={{user, setUser}}>
-      <OfflineNotice />
       <CartContextProvider>
-        <NavigationContainer theme={navigationTheme}>
-          {user ? <AppNavigator /> : <AuthNavigator />}
-        </NavigationContainer>
+        <AddressContextProvider>
+          <PaymentContextProvider>
+            <OfflineNotice />
+            <NavigationContainer theme={navigationTheme}>
+              {user ? <AppNavigator /> : <AuthNavigator />}
+            </NavigationContainer>
+          </PaymentContextProvider>
+        </AddressContextProvider>
       </CartContextProvider>
     </AuthContext.Provider>
   );

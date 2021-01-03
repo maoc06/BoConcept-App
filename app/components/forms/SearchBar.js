@@ -25,6 +25,8 @@ function SearchBar({width, onChangeText, value, ...otherProps}) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.whiteAccent,
+    shadowColor: 'transparent',
+    elevation: 0,
   },
 });
 

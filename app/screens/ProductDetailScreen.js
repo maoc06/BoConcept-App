@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet} from 'react-native';
 import ReadMore from 'react-native-read-more-text';
 
@@ -9,15 +9,31 @@ import Carousel from '../components/carousel/Carousel';
 import ActivityIndicator from '../components/ActivityIndicator';
 import useCart from '../hooks/useCart';
 import useApi from '../hooks/useApi';
+import productApi from '../api/product';
 import shprApi from '../api/shoppingProduct';
 import {currencyFormat} from '../utility/currency';
 
 function ProductDetailScreen({route}) {
   const {cart, addCartItem} = useCart();
   const addToCartApi = useApi(shprApi.addShoppingProduct);
+  const getProductImagesApi = useApi(productApi.getProductImages);
 
   const product = route.params;
   const {pro_id, name, images, description, price} = product;
+
+  const [productImages, setProductImages] = useState(images);
+
+  useEffect(() => {
+    if (product.images === undefined) {
+      getProductImagesApi.request(pro_id);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (getProductImagesApi.data.data) {
+      setProductImages(getProductImagesApi.data.data);
+    }
+  }, [getProductImagesApi.data.data]);
 
   const handleAddToCart = () => {
     const shoppingProduct = {
@@ -34,7 +50,7 @@ function ProductDetailScreen({route}) {
       <ActivityIndicator visible={addToCartApi.loading} />
 
       <Screen>
-        <Carousel list={images} />
+        {productImages !== undefined && <Carousel list={productImages} />}
 
         <Text style={styles.title}>{name}</Text>
 

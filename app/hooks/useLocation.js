@@ -4,7 +4,7 @@ import {useEffect} from 'react';
 
 export default useLocation = () => {
   const [location, setLocation] = useState();
-  const latitudeDelta = 15.0;
+  const latitudeDelta = 18.0;
   const longitudeDelta = 0.0421;
 
   const getLocation = async () => {

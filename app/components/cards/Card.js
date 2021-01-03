@@ -31,8 +31,6 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     flex: 1,
     overflow: 'hidden',
-    // borderWidth: 1,
-    // borderColor: colors.redAccent,
   },
   detailsContainer: {
     display: 'flex',
@@ -46,6 +44,7 @@ const styles = StyleSheet.create({
     height: 200,
     padding: 5,
     backgroundColor: colors.whiteAccent,
+    justifyContent: 'center',
   },
   title: {
     color: colors.dark,

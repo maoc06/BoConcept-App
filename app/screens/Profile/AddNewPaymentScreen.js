@@ -6,6 +6,7 @@ import Screen from '../../components/Screen';
 import {Form, FormField, SubmitButton} from '../../components/forms';
 import useApi from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
+import usePayments from '../../hooks/usePayments';
 import creditCardApi from '../../api/creditCard';
 
 const validationSchema = Yup.object().shape({
@@ -22,24 +23,34 @@ const validationSchema = Yup.object().shape({
     .min(1)
     .max(2)
     .label('Expiry month'),
+  expiry_month: Yup.number().min(1).max(12).label('Expiry month'),
   expiry_year: Yup.string()
     .required()
     .matches(/^[0-9]+$/, 'Must be only digits')
     .min(2)
     .max(4)
     .label('Expiry year'),
+  expiry_year: Yup.number().min(2021).label('Expiry year'),
   cvv: Yup.number().required().min(3).label('cvc/cvv2'),
 });
 
 function AddNewPaymentScreen() {
   const {user} = useAuth();
-  const savePaymentMethodApi = useApi(creditCardApi.saveCreditCrad);
+  const {addPayment} = usePayments();
+
   const [paymentId, setPaymentId] = useState();
 
+  const savePaymentMethodApi = useApi(creditCardApi.saveCreditCrad);
+
   const handleSubmit = (cardInfo) => {
+    if (paymentId === -1) {
+      console.log('Payment method its not valid');
+      return;
+    }
     cardInfo['credit_card_owner'] = user.info.email;
     cardInfo['pay_id'] = paymentId;
     savePaymentMethodApi.request(cardInfo);
+    addPayment(cardInfo);
   };
 
   return (
@@ -59,6 +70,7 @@ function AddNewPaymentScreen() {
             name="cardholders_name"
             placeholder="Cardholder's name"
             label="Cardholder's name"
+            autoCapitalize="characters"
           />
 
           <FormField

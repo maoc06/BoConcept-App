@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, ImageBackground} from 'react-native';
+import {ScrollView, StyleSheet, ImageBackground} from 'react-native';
 import * as Yup from 'yup';
 
 import Screen from '../components/Screen';
@@ -16,7 +16,7 @@ import {
 import authApi from '../api/auth';
 import useApi from '../hooks/useApi';
 import useAuth from '../hooks/useAuth';
-import {ScrollView} from 'react-native-gesture-handler';
+import routes from '../navigation/routes';
 
 const validationSchema = Yup.object().shape({
   first_name: Yup.string().required().label('First Name'),
@@ -26,7 +26,7 @@ const validationSchema = Yup.object().shape({
   terms: Yup.bool().oneOf([true], 'Must accept Terms of Service'),
 });
 
-function RegisterScreen() {
+function RegisterScreen({navigation}) {
   const registerApi = useApi(authApi.signUp);
   const loginApi = useApi(authApi.signIn);
   const auth = useAuth();
@@ -133,6 +133,7 @@ function RegisterScreen() {
                 textColor="primary"
                 alignText="flex-start"
                 marginVertical={20}
+                onPress={() => navigation.navigate(routes.LOGIN)}
               />
             </Form>
           </ScrollView>

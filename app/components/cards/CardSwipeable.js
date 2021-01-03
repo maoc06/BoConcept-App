@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, TouchableOpacity, StyleSheet} from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import Card from './Card';
@@ -23,6 +23,7 @@ function SwipeableCard({
   handleAuxButton,
   handleAdd,
   handleRemove,
+  viewFullDetails,
 }) {
   const LeftActions = () => {
     return <ButtonSwip title={'Edit'} onPress={onPressLeft} />;
@@ -72,7 +73,9 @@ function SwipeableCard({
           <Text>{currencyFormat(product.price)}</Text>
 
           {!showDescription && (
-            <Text style={styles.auxDescription}>View full details</Text>
+            <TouchableOpacity onPress={viewFullDetails}>
+              <Text style={styles.auxDescription}>View full details</Text>
+            </TouchableOpacity>
           )}
 
           {showAuxButton && (

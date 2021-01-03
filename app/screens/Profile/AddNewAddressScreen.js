@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {ScrollView} from 'react-native';
 import * as Yup from 'yup';
 
@@ -11,6 +11,7 @@ import {
 } from '../../components/forms';
 import useApi from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
+import useAddress from '../../hooks/useAddress';
 import addressApi from '../../api/address';
 
 const validationSchema = Yup.object().shape({
@@ -24,6 +25,7 @@ const validationSchema = Yup.object().shape({
 
 function AddNewAddressScreen() {
   const {user} = useAuth();
+  const {addAddress} = useAddress();
   const saveAddressApi = useApi(addressApi.saveAddress);
 
   const handleSubmit = (addressInfo) => {
@@ -31,6 +33,12 @@ function AddNewAddressScreen() {
     addressInfo['is_default'] = 'N';
     saveAddressApi.request(addressInfo);
   };
+
+  useEffect(() => {
+    if (saveAddressApi.data.data !== undefined) {
+      addAddress(saveAddressApi.data.data);
+    }
+  }, [saveAddressApi.data.data]);
 
   return (
     <ScrollView>

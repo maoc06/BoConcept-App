@@ -8,6 +8,7 @@ import {RadioButton, ErrorMessage} from '../../components/forms';
 import {SelectAddress, AddNewContainer} from '../../components/lists';
 import useApi from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
+import useAddress from '../../hooks/useAddress';
 import useCart from '../../hooks/useCart';
 import addressApi from '../../api/address';
 import shippingMethodsApi from '../../api/shippingMethods';
@@ -16,10 +17,13 @@ import routes from '../../navigation/routes';
 
 function ShippingScreen({setStep, navigation}) {
   const {user} = useAuth();
+  const {address, setInitial} = useAddress();
   const {cart, setCartBillingAddress, setCartShippingMethod} = useCart();
+
   const getCustomerAddressApi = useApi(addressApi.getAddressCustomer);
   const getShippingMethodsApi = useApi(shippingMethodsApi.getShippingMethods);
-  const [customerAddress, setCustomerAddress] = useState();
+
+  // const [customerAddress, setCustomerAddress] = useState();
   const [errorBillingAddress, setErrorBillingAddress] = useState(false);
 
   useEffect(() => {
@@ -28,8 +32,10 @@ function ShippingScreen({setStep, navigation}) {
   }, []);
 
   useEffect(() => {
-    setCustomerAddress(getCustomerAddressApi.data.data);
-  });
+    if (getCustomerAddressApi.data.data !== undefined) {
+      setInitial(getCustomerAddressApi.data.data);
+    }
+  }, [getCustomerAddressApi.data.data]);
 
   const handleSelectShippigMethod = (value) => {
     setCartShippingMethod(value);
@@ -106,15 +112,14 @@ function ShippingScreen({setStep, navigation}) {
   };
 
   const renderEmptyMessage = () => {
-    if (customerAddress !== undefined) {
-      if (customerAddress.length === 0) {
-        return (
-          <Text style={styles.empty}>
-            You don't have address yet. Add a new one.
-          </Text>
-        );
-      }
+    if (address.length === 0) {
+      return (
+        <Text style={styles.empty}>
+          You don't have address yet. Add a new one.
+        </Text>
+      );
     }
+
     return null;
   };
 
@@ -127,7 +132,7 @@ function ShippingScreen({setStep, navigation}) {
       <FlatList
         fadingEdgeLength={50}
         ListHeaderComponent={renderHeaderList()}
-        data={getCustomerAddressApi.data.data}
+        data={address}
         keyExtractor={(address) => address.address_id.toString()}
         renderItem={({item}) => (
           <SelectAddress

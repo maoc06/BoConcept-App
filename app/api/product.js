@@ -12,9 +12,12 @@ const getProductsByQuery = ({query}) =>
 
 const getProduct = (proId) => client.get(`${endpoint}/${proId}`);
 
+const getProductImages = (proId) => client.get(`${endpoint}/image/${proId}`);
+
 export default {
   getProducts,
   getProductsByCategory,
   getProductsByQuery,
   getProduct,
+  getProductImages,
 };

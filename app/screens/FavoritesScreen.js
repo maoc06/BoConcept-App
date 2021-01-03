@@ -9,7 +9,6 @@ import ActivityIndicator from '../components/ActivityIndicator';
 import useAuth from '../hooks/useAuth';
 import useCart from '../hooks/useCart';
 import useApi from '../hooks/useApi';
-// import cartApi from '../api/cart';
 import favoriteApi from '../api/favorite';
 import shprApi from '../api/shoppingProduct';
 import colors from '../config/colors';
@@ -21,14 +20,12 @@ function FavoritesScreen({navigation}) {
 
   const getFavoritesApi = useApi(favoriteApi.getFavorites);
   const deleteFavoriteApi = useApi(favoriteApi.deleteFavorite);
-  // const getCartApi = useApi(cartApi.getCurrCartCustomer);
   const addShoppingProductApi = useApi(shprApi.addShoppingProduct);
 
   const [favorites, setFavorites] = useState();
 
   useEffect(() => {
     getFavoritesApi.request({email: user.info.email});
-    // getCartApi.request({email: user.info.email});
   }, []);
 
   useEffect(() => {
@@ -84,6 +81,9 @@ function FavoritesScreen({navigation}) {
             showQuantity={false}
             showAuxButton={true}
             handleAuxButton={() => handlAddToCart(item)}
+            viewFullDetails={() =>
+              navigation.navigate(routes.PRODUCT_DETAIL, item)
+            }
           />
         )}
       />

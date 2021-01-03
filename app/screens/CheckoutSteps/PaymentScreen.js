@@ -9,6 +9,7 @@ import {ErrorMessage} from '../../components/forms';
 import useApi from '../../hooks/useApi';
 import useAuth from '../../hooks/useAuth';
 import useCart from '../../hooks/useCart';
+import usePayments from '../../hooks/usePayments';
 import creditCardApi from '../../api/creditCard';
 import colors from '../../config/colors';
 import routes from '../../navigation/routes';
@@ -16,17 +17,21 @@ import routes from '../../navigation/routes';
 function PaymentScreen({setStep, navigation}) {
   const {user} = useAuth();
   const {cart, setCartCreditCard} = useCart();
-  const getCreditCards = useApi(creditCardApi.getCreditCardsByCustomer);
-  const [creditCards, setCreditCards] = useState();
+  const {payments, setInitial} = usePayments();
+
   const [error, setError] = useState(false);
+
+  const getCreditCards = useApi(creditCardApi.getCreditCardsByCustomer);
 
   useEffect(() => {
     getCreditCards.request({email: user.info.email});
   }, []);
 
   useEffect(() => {
-    setCreditCards(getCreditCards.data.data);
-  });
+    if (getCreditCards.data.data !== undefined) {
+      setInitial(getCreditCards.data.data);
+    }
+  }, [getCreditCards.data.data]);
 
   const handlePaymentMethod = (value) => {
     setError(false);
@@ -42,14 +47,12 @@ function PaymentScreen({setStep, navigation}) {
   };
 
   const renderEmptyMessage = () => {
-    if (creditCards !== undefined) {
-      if (creditCards.length === 0) {
-        return (
-          <Text style={styles.empty}>
-            You don't have payment methods yet. Add a new one.
-          </Text>
-        );
-      }
+    if (payments.length === 0) {
+      return (
+        <Text style={styles.empty}>
+          You don't have payment methods yet. Add a new one.
+        </Text>
+      );
     }
     return null;
   };
@@ -67,7 +70,7 @@ function PaymentScreen({setStep, navigation}) {
             {renderEmptyMessage()}
           </>
         }
-        data={getCreditCards.data.data}
+        data={payments}
         keyExtractor={(creditCard) => creditCard.card_number.toString()}
         renderItem={({item}) => (
           <SelectPayment

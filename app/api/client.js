@@ -6,6 +6,8 @@ const apiClient = create({
   baseURL: API_URL,
 });
 
+// console.log(API_URL);
+
 apiClient.addAsyncRequestTransform(async (request) => {
   const accessToken = await authStorage.getToken();
   if (!accessToken) return;

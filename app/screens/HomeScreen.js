@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet} from 'react-native';
+import {FlatList, View, StyleSheet} from 'react-native';
 
 import ActivityIndicator from '../components/ActivityIndicator';
 import Screen from '../components/Screen';
@@ -102,30 +102,34 @@ function HomeScreen({navigation}) {
         }
       />
 
-      <Screen>
+      <View style={styles.searchBarContainer}>
         <SearchBar
           placeholder="What are you looking for?"
           onChangeText={handleSearch}
           value={searchQuery}
         />
+      </View>
 
-        <FlatList
-          horizontal
-          data={getCategoryApi.data.data}
-          keyExtractor={(category) => category.cat_id.toString()}
-          renderItem={({item}) => (
-            <TextCategory
-              active={item.cat_id === category}
-              onPress={() => handleCategory(item.cat_id)}>
-              {item.name}
-            </TextCategory>
-          )}
-          style={styles.categoriesContainer}
-        />
+      <FlatList
+        horizontal
+        data={getCategoryApi.data.data}
+        keyExtractor={(category) => category.cat_id.toString()}
+        renderItem={({item}) => (
+          <TextCategory
+            active={item.cat_id === category}
+            onPress={() => handleCategory(item.cat_id)}>
+            {item.name}
+          </TextCategory>
+        )}
+        style={styles.categoriesContainer}
+      />
 
+      <Screen>
         {getProductsByCategoryApi.error && (
           <>
-            <Text>Couldn't retrieve products.</Text>
+            <Text style={{textAlign: 'center'}}>
+              Couldn't retrieve products.
+            </Text>
             <Button title="Retry" onPress={getProductsByCategoryApi.request} />
           </>
         )}
@@ -140,7 +144,12 @@ const styles = StyleSheet.create({
   categoriesContainer: {
     minHeight: 30,
     maxHeight: 30,
-    marginVertical: 30,
+    marginLeft: 16,
+    marginTop: 30,
+  },
+  searchBarContainer: {
+    paddingHorizontal: 16,
+    marginTop: 25,
   },
 });
 
